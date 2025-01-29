@@ -3,7 +3,7 @@ import { Link } from "react-router";
 import { AuthContext } from "../../context/AuthContext";
 
 export function AuthComponent({ login }: { login: boolean }) {
-  const { register } = useContext(AuthContext);
+  const { register, login: authLogin } = useContext(AuthContext);
   const [formData, setFormData] = useState({ email: "", password: "" });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -13,8 +13,18 @@ export function AuthComponent({ login }: { login: boolean }) {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    register({ email: formData.email, password: formData.password });
-    setFormData({ email: "", password: "" });
+
+    if (login) {
+      authLogin(formData.email, formData.password);
+      setFormData({ email: "", password: "" });
+    } else {
+      register({
+        id: Math.floor(100000 + Math.random() * 900000),
+        email: formData.email,
+        password: formData.password,
+      });
+      setFormData({ email: "", password: "" });
+    }
   };
 
   //
