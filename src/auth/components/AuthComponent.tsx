@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import React, { useContext, useState } from "react";
 import { Link } from "react-router";
 import { AuthContext } from "../../context/AuthContext";
 
@@ -19,7 +19,7 @@ export function AuthComponent({ login }: { login: boolean }) {
       setFormData({ email: "", password: "" });
     } else {
       register({
-        id: Math.floor(100000 + Math.random() * 900000),
+        id: Math.floor(Math.random() * 1000).toString(),
         email: formData.email,
         password: formData.password,
       });
