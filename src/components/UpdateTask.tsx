@@ -1,64 +1,68 @@
-import { useEffect, useState } from "react";
-import { nanoid } from "nanoid";
+import { useState } from "react";
 import { Task } from "./Content";
 
 interface Props {
-  isOpen: boolean;
+  task: Task;
   onClose: () => void;
   setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
 }
-
-export const TaskStatusEnum = {
-  Planned: "Planned",
-  Active: "Active",
-  Resolved: "Resolved",
-};
-
-export default function AddTaskModal({ isOpen, onClose, setTasks }: Props) {
-  if (!isOpen) return null;
-
-  const [taskData, setTaskData] = useState({ title: "", description: "" });
-
-  useEffect(() => {
-    if (isOpen) {
-      setTaskData({ title: "", description: "" });
-    }
-  }, []);
+export default function UpdateTask({ task, onClose, setTasks }: Props) {
+  const [taskData, setTaskData] = useState(task);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { name, value } = e.target;
     setTaskData({ ...taskData, [name]: value });
   };
 
-  const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const newTask = {
-      id: nanoid(),
-      status: TaskStatusEnum.Planned,
-      ...taskData,
-    };
+
+    const existingTasks = localStorage.getItem("tasks");
+
+    const taskToUpdate = JSON.parse(existingTasks || "[]").find(
+      (t: Task) => t.id === task.id
+    );
+
+    if (!taskToUpdate) {
+      return;
+    }
 
     localStorage.setItem(
       "tasks",
-      JSON.stringify([
-        ...JSON.parse(localStorage.getItem("tasks") || "[]"),
-        newTask,
-      ])
+      JSON.stringify(
+        JSON.parse(existingTasks || "[]").map((t: Task) =>
+          t.id === task.id ? { ...t, ...taskData } : t
+        )
+      )
     );
 
-    setTasks(JSON.parse(localStorage.getItem("tasks") || "[]") as Task[]);
-
+    setTasks(JSON.parse(localStorage.getItem("tasks") || "[]"));
     onClose();
-    setTaskData({ title: "", description: "" });
   };
 
   return (
     <div className="fixed inset-0 flex items-center justify-center backdrop-blur-none ">
       <div className="bg-white p-5 rounded shadow-lg w-110">
         <form onSubmit={handleFormSubmit}>
-          <h2 className="text-lg font-semibold mb-4">Create New Task</h2>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-semibold mb-4">Update Task</h2>
+
+            <select
+              name="status"
+              value={taskData.status}
+              onChange={handleInputChange}
+              className="border p-2 rounded"
+            >
+              <option value="Planned">Planned</option>
+              <option value="Active">Active</option>
+              <option value="Resolved">Resolved</option>
+            </select>
+          </div>
+
           <input
             type="text"
             name="title"
@@ -87,7 +91,7 @@ export default function AddTaskModal({ isOpen, onClose, setTasks }: Props) {
               type="submit"
               className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded cursor-pointer hover:bg-gray-50"
             >
-              Create
+              Update
             </button>
           </div>
         </form>
