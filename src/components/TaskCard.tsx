@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { TrashIcon } from "@heroicons/react/16/solid";
 import DeleteTask from "./DeleteTask";
+import { TrashIcon } from "@heroicons/react/16/solid";
 
 interface TaskCardProps {
+  id: string;
   title: string;
   description: string;
   status: "Planned" | "Active" | "Resolved";
@@ -16,6 +17,7 @@ export const statusColors = {
 };
 
 export default function TaskCard({
+  id: taskId,
   title,
   description,
   status,
@@ -47,7 +49,10 @@ export default function TaskCard({
         </span>
 
         {showDeleteDialog && (
-          <DeleteTask onClose={() => setShowDeleteDialog(false)} />
+          <DeleteTask
+            onClose={() => setShowDeleteDialog(false)}
+            taskId={taskId}
+          />
         )}
       </div>
     </div>

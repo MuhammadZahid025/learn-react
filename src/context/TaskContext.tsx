@@ -12,6 +12,10 @@ type Action =
   | {
       type: "UPDATE_TASK";
       payload: { id: string; task: Partial<Task> };
+    }
+  | {
+      type: "DELETE_TASK";
+      payload: { id: string };
     };
 
 interface TaskContextValue {
@@ -57,6 +61,14 @@ function taskReducer(state: State, action: Action) {
       localStorage.setItem("tasks", JSON.stringify(updatedTasks));
       return { tasks: updatedTasks };
     }
+    case "DELETE_TASK": {
+      const updatedTasks = state.tasks.filter(
+        (task) => task.id !== action.payload.id
+      );
+      localStorage.setItem("tasks", JSON.stringify(updatedTasks));
+      return { tasks: updatedTasks };
+    }
+
     default:
       return state;
   }

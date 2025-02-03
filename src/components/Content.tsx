@@ -40,6 +40,7 @@ export default function Content() {
           .map((task) => (
             <TaskCard
               key={task.id}
+              id={task.id}
               title={task.title}
               description={task.description}
               status={task.status}
@@ -67,6 +68,7 @@ export default function Content() {
           .map((task) => (
             <TaskCard
               key={task.id}
+              id={task.id}
               title={task.title}
               description={task.description}
               status={task.status}
@@ -82,6 +84,7 @@ export default function Content() {
           .map((task) => (
             <TaskCard
               key={task.id}
+              id={task.id}
               title={task.title}
               description={task.description}
               status={task.status}
