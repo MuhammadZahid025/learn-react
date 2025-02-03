@@ -1,23 +1,23 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { nanoid } from "nanoid";
-import { Task } from "./Content";
+import { TaskContext } from "../context/TaskContext";
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
 }
 
-export const TaskStatusEnum = {
-  Planned: "Planned",
-  Active: "Active",
-  Resolved: "Resolved",
-};
+export enum TaskStatusEnum {
+  Planned = "Planned",
+  Active = "Active",
+  Resolved = "Resolved",
+}
 
-export default function AddTaskModal({ isOpen, onClose, setTasks }: Props) {
+export default function AddTaskModal({ isOpen, onClose }: Props) {
   if (!isOpen) return null;
 
   const [taskData, setTaskData] = useState({ title: "", description: "" });
+  const { dispatch } = useContext(TaskContext);
 
   useEffect(() => {
     if (isOpen) {
@@ -34,21 +34,14 @@ export default function AddTaskModal({ isOpen, onClose, setTasks }: Props) {
 
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     const newTask = {
       id: nanoid(),
       status: TaskStatusEnum.Planned,
       ...taskData,
     };
 
-    localStorage.setItem(
-      "tasks",
-      JSON.stringify([
-        ...JSON.parse(localStorage.getItem("tasks") || "[]"),
-        newTask,
-      ])
-    );
-
-    setTasks(JSON.parse(localStorage.getItem("tasks") || "[]") as Task[]);
+    dispatch({ type: "ADD_TASK", payload: newTask });
 
     onClose();
     setTaskData({ title: "", description: "" });
@@ -79,13 +72,13 @@ export default function AddTaskModal({ isOpen, onClose, setTasks }: Props) {
             <button
               onClick={onClose}
               type="button"
-              className="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded mr-2 cursor-pointer hover:bg-gray-50"
+              className="bg-gray-400 text-white px-4 py-2 rounded mr-2 cursor-pointer hover:bg-gray-50"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded cursor-pointer hover:bg-gray-50"
+              className="bg-gray-500 text-white px-4 py-2 rounded cursor-pointer hover:bg-gray-50"
             >
               Create
             </button>

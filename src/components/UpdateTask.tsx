@@ -1,13 +1,14 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Task } from "./Content";
+import { TaskContext } from "../context/TaskContext";
 
 interface Props {
   task: Task;
   onClose: () => void;
-  setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
 }
-export default function UpdateTask({ task, onClose, setTasks }: Props) {
+export default function UpdateTask({ task, onClose }: Props) {
   const [taskData, setTaskData] = useState(task);
+  const { dispatch } = useContext(TaskContext);
 
   const handleInputChange = (
     e: React.ChangeEvent<
@@ -20,27 +21,7 @@ export default function UpdateTask({ task, onClose, setTasks }: Props) {
 
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    const existingTasks = localStorage.getItem("tasks");
-
-    const taskToUpdate = JSON.parse(existingTasks || "[]").find(
-      (t: Task) => t.id === task.id
-    );
-
-    if (!taskToUpdate) {
-      return;
-    }
-
-    localStorage.setItem(
-      "tasks",
-      JSON.stringify(
-        JSON.parse(existingTasks || "[]").map((t: Task) =>
-          t.id === task.id ? { ...t, ...taskData } : t
-        )
-      )
-    );
-
-    setTasks(JSON.parse(localStorage.getItem("tasks") || "[]"));
+    dispatch({ type: "UPDATE_TASK", payload: { id: task.id, task: taskData } });
     onClose();
   };
 
@@ -83,13 +64,13 @@ export default function UpdateTask({ task, onClose, setTasks }: Props) {
             <button
               onClick={onClose}
               type="button"
-              className="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded mr-2 cursor-pointer hover:bg-gray-50"
+              className="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded mr-2 cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded cursor-pointer hover:bg-gray-50"
+              className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded cursor-pointer "
             >
               Update
             </button>

@@ -1,27 +1,24 @@
-import { useEffect, useState } from "react";
-import AddTaskModal from "./AddTaskModal";
+import { useContext, useState } from "react";
+import AddTaskModal, { TaskStatusEnum } from "./AddTaskModal";
 import TaskCard from "./TaskCard";
 import UpdateTask from "./UpdateTask";
+import { TaskContext } from "../context/TaskContext";
 
 export interface Task {
-  id: number;
+  id: string;
   title: string;
   description: string;
-  status: "Planned" | "Active" | "Resolved";
+  status: TaskStatusEnum;
 }
 
 export default function Content() {
   const [isOpen, setIsOpen] = useState(false);
-  const [tasks, setTasks] = useState<Task[]>([]);
   const [selectedTask, setSelectedTask] = useState<Task>();
   const [updateModalOpen, setUpdateModalOpen] = useState(false);
 
-  useEffect(() => {
-    const storedTasks = localStorage.getItem("tasks");
-    if (storedTasks) {
-      setTasks(JSON.parse(storedTasks));
-    }
-  }, []);
+  const {
+    state: { tasks },
+  } = useContext(TaskContext);
 
   const handleTaskClick = (task: Task) => {
     setSelectedTask(task);
@@ -54,17 +51,12 @@ export default function Content() {
           <UpdateTask
             task={selectedTask}
             onClose={() => setUpdateModalOpen(false)}
-            setTasks={setTasks}
           />
         )}
       </div>
 
       {isOpen && (
-        <AddTaskModal
-          isOpen={isOpen}
-          onClose={() => setIsOpen(false)}
-          setTasks={setTasks}
-        />
+        <AddTaskModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
       )}
 
       <div className="border border-gray-400 rounded-lg p-4 bg-gray-100 min-h-[80vh]">
