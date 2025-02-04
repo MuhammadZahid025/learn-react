@@ -1,6 +1,7 @@
 import { useState } from "react";
 import DeleteTask from "./DeleteTask";
 import { TrashIcon } from "@heroicons/react/16/solid";
+import { useDraggable } from "@dnd-kit/core";
 
 interface TaskCardProps {
   id: string;
@@ -24,9 +25,23 @@ export default function TaskCard({
   onClick,
 }: TaskCardProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+    id: taskId,
+    data: { id: taskId, status, title, description },
+  });
+
   return (
     <div
       onClick={onClick}
+      ref={setNodeRef}
+      {...attributes}
+      {...listeners}
+      style={{
+        transform: transform
+          ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
+          : undefined,
+      }}
       className="border border-gray-300 rounded-lg p-4 mb-4 mt-4 bg-white shadow-sm hover:shadow-md transition-shadow cursor-pointer hover:bg-gray-50"
     >
       <div className="flex justify-between items-center">

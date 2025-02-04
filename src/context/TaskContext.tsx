@@ -1,5 +1,6 @@
 import { createContext, Dispatch, useEffect, useReducer } from "react";
 import { Task } from "../components/Content";
+import { TaskStatusEnum } from "../components/AddTaskModal";
 
 interface State {
   tasks: Task[];
@@ -16,6 +17,10 @@ type Action =
   | {
       type: "DELETE_TASK";
       payload: { id: string };
+    }
+  | {
+      type: "UPDATE_TASKS_STATUS";
+      payload: { id: string; status: TaskStatusEnum };
     };
 
 interface TaskContextValue {
@@ -64,6 +69,18 @@ function taskReducer(state: State, action: Action) {
     case "DELETE_TASK": {
       const updatedTasks = state.tasks.filter(
         (task) => task.id !== action.payload.id
+      );
+      localStorage.setItem("tasks", JSON.stringify(updatedTasks));
+      return { tasks: updatedTasks };
+    }
+
+    case "UPDATE_TASKS_STATUS": {
+      const task = state.tasks.find((task) => task.id === action.payload.id);
+      if (!task) {
+        return state;
+      }
+      const updatedTasks = state.tasks.map((t) =>
+        t.id === task.id ? { ...t, status: task.status } : t
       );
       localStorage.setItem("tasks", JSON.stringify(updatedTasks));
       return { tasks: updatedTasks };
